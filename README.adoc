@@ -1,0 +1,64 @@
+= btrfs-scrub-scheduler
+
+Smart scheduler for BTRFS scrubbing. Make `btrfs scrub` run only during the maintenance window.
+
+*Problem:*
+
+You want to periodically scrub your BTRFS filesystems,
+but it takes too long to scrub them all at once
+and the IO is overloaded during scrubbing.
+
+*Solution:*
+
+Use this scheduler to run `btrfs scrub` only during the maintenance window.
+
+
+== Implementation
+
+The current implementation is trivial:
+
+* `btrfs-scrub-scheduler` is supposed to run daily at the beginning of the maintenance window.
+* it tracks the last scrub date of each filesystem to know when a scrub should be run next time
+* it scrubs *only one filesystem at once*, so that scrubbing all filesystems will be distributed over several days
+
+== Installation
+
+=== Prerequisites
+
+You will need the following tools on your server:
+
+* Git to clone this repository
+* Node.js to run the scheduler
+* NPM to install dependencies
+
+Running this should suffice on a recent Debian or Ubuntu:
+
+----
+apt install git npm
+----
+
+=== Setup
+
+1. Clone this repository:
++
+----
+git clone https://github.com/antrew/btrfs-scrub-scheduler.git
+cd btrfs-scrub-scheduler
+npm install
+----
+2. Configure the period and filesystems you want to scrub by creating `config.json` that looks like this:
++
+----
+{
+  "period": 30,
+  "filesystems": [
+    "/",
+    "/mnt/example"
+  ]
+}
+----
+3. Create a cronjob that will start the scheduler daily at the beginning of the maintenance window.
++
+----
+0 0 * * * cd /root/btrfs-scrub-scheduler ; ./index.ts
+----
