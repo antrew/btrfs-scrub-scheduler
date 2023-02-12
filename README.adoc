@@ -34,7 +34,7 @@ You will need the following tools on your server:
 Running this should suffice on a recent Debian or Ubuntu:
 
 ----
-apt install git npm
+apt install git nodejs
 ----
 
 === Setup

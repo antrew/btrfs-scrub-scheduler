@@ -8,8 +8,10 @@ jest.mock("./Scrubber");
 
 const NOW = "2023-02-01T00:00:00.000Z";
 
-jest.useFakeTimers({
-  now: moment(NOW).valueOf(),
+jest.useFakeTimers();
+
+beforeEach(() => {
+  jest.setSystemTime(moment(NOW).valueOf());
 });
 
 it("should scrub when no previous runs", async () => {
