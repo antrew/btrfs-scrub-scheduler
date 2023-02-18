@@ -44,7 +44,7 @@ apt install git nodejs
 wget -O /usr/local/bin/btrfs-scrub-scheduler https://github.com/antrew/btrfs-scrub-scheduler/releases/latest/download/btrfs-scrub-scheduler
 chmod +x /usr/local/bin/btrfs-scrub-scheduler
 ----
-2. Configure the period and filesystems you want to scrub by creating `config.json` that looks like this:
+2. Configure the period and filesystems you want to scrub by creating a configuration file `/etc/btrfs-scrub-scheduler/config.json` that looks like this:
 +
 ----
 {
