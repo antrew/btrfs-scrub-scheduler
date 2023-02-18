@@ -1,6 +1,7 @@
 = btrfs-scrub-scheduler
 
-Smart scheduler for BTRFS scrubbing. Make `btrfs scrub` run only during the maintenance window.
+Smart scheduler for BTRFS scrubbing.
+Make `btrfs scrub` run only during the maintenance window.
 
 *Problem:*
 
@@ -12,14 +13,14 @@ and the IO is overloaded during scrubbing.
 
 Use this scheduler to run `btrfs scrub` only during the maintenance window.
 
-
 == Implementation
 
-The current implementation is trivial:
+Scrubbing is run only during the maintenance window and distributed over several days:
 
 * `btrfs-scrub-scheduler` is supposed to run daily at the beginning of the maintenance window.
-* it tracks the last scrub date of each filesystem to know when a scrub should be run next time
-* it scrubs *only one filesystem at once*, so that scrubbing all filesystems will be distributed over several days
+* track the last scrub date of each filesystem to know when a scrub should be run next time
+* interrupt scrubbing at the end of the maintenance window
+* resume scrubbing on the next run
 
 == Installation
 
@@ -51,6 +52,7 @@ npm install
 ----
 {
   "period": 30,
+  "maxDuration": "PT7H",
   "filesystems": [
     "/",
     "/mnt/example"
