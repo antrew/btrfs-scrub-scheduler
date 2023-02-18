@@ -28,9 +28,7 @@ Scrubbing is run only during the maintenance window and distributed over several
 
 You will need the following tools on your server:
 
-* Git to clone this repository
 * Node.js to run the scheduler
-* NPM to install dependencies
 
 Running this should suffice on a recent Debian or Ubuntu:
 
@@ -40,12 +38,11 @@ apt install git nodejs
 
 === Setup
 
-1. Clone this repository:
+1. Download the latest release:
 +
 ----
-git clone https://github.com/antrew/btrfs-scrub-scheduler.git
-cd btrfs-scrub-scheduler
-npm install
+wget -O /usr/local/bin/btrfs-scrub-scheduler https://github.com/antrew/btrfs-scrub-scheduler/releases/latest/download/btrfs-scrub-scheduler
+chmod +x /usr/local/bin/btrfs-scrub-scheduler
 ----
 2. Configure the period and filesystems you want to scrub by creating `config.json` that looks like this:
 +
@@ -62,5 +59,5 @@ npm install
 3. Create a cronjob that will start the scheduler daily at the beginning of the maintenance window.
 +
 ----
-0 0 * * * cd /root/btrfs-scrub-scheduler ; ./index.ts
+0 0 * * * /usr/local/bin/btrfs-scrub-scheduler
 ----
