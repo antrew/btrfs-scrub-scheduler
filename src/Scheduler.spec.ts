@@ -102,7 +102,7 @@ it("should cancel a running scrub at the end of the maintenance window", async (
   await scrubCalledPromise;
   jest.advanceTimersByTime(moment.duration("PT1H").asMilliseconds() * 1.1);
   rejectScrub(new Error());
-  await expect(schedulerPromise).rejects.toThrow();
+  await schedulerPromise;
 
   expect(scrubber.status).toHaveBeenCalledTimes(1);
   expect(scrubber.scrub).toHaveBeenCalledTimes(1);

@@ -41,25 +41,37 @@ export class Scheduler {
       }
       const scrubStatus = await this.scrubber.status(filesystem);
       let timeout;
+      let wasInterrupted = false;
       if (this.maxDuration) {
         console.info(`Will cancel scrub after ${this.maxDuration}`);
         timeout = setTimeout(async () => {
           console.info(`Timeout reached. Cancelling scrub of ${filesystem}`);
+          wasInterrupted = true;
           await this.scrubber.cancel(filesystem);
           console.info(`Scrub cancelled for ${filesystem}`);
         }, this.maxDuration.asMilliseconds());
       }
-      if (scrubStatus.aborted) {
-        console.info(`Resuming aborted scrub for ${filesystem}`);
-        await this.scrubber.resume(filesystem);
-      } else {
-        console.info(`Scrubbing ${filesystem}`);
-        await this.scrubber.scrub(filesystem);
+      try {
+        if (scrubStatus.aborted) {
+          console.info(`Resuming aborted scrub for ${filesystem}`);
+          await this.scrubber.resume(filesystem);
+        } else {
+          console.info(`Scrubbing ${filesystem}`);
+          await this.scrubber.scrub(filesystem);
+        }
+      } catch (error) {
+        if (wasInterrupted) {
+          // this was expected
+        } else {
+          throw error;
+        }
       }
       if (timeout) {
         clearTimeout(timeout);
       }
-      this.lastRun[filesystem] = new Date().toISOString();
+      if (!wasInterrupted) {
+        this.lastRun[filesystem] = new Date().toISOString();
+      }
       return;
     }
   }
