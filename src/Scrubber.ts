@@ -1,6 +1,6 @@
 import { exec, spawn } from "child_process";
 
-const scrubOptions = ["-B", "-d", "-c", "2", "-n", "7"];
+const scrubOptions = ["-B", "-d", "-c", "3", "-n", "7"];
 
 export class Scrubber {
   public async scrub(filesystem: string) {
