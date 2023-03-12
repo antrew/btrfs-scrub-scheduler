@@ -19,3 +19,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: dist/btrfs-scrub-scheduler
+          body_path: CHANGELOG.md
