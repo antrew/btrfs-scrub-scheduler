@@ -3,16 +3,13 @@ import { Scrubber } from "./Scrubber";
 import { LastRun } from "./LastRun";
 import moment, { Duration } from "moment";
 
-interface SchedulerProps {
-  period: number;
-  maxDuration?: string;
-  filesystems: string[];
+interface SchedulerProps extends Configuration {
   scrubber: Scrubber;
   lastRun: LastRun;
 }
 
 export class Scheduler {
-  private period: number;
+  private period: Duration;
   private maxDuration: Duration;
   private filesystems: string[];
   private scrubber: Scrubber;
@@ -31,7 +28,7 @@ export class Scheduler {
   async run() {
     for (let filesystem of this.filesystems) {
       const lastRun = moment(this.lastRun[filesystem] ?? "1970");
-      const nextRun = lastRun.add(this.period, "days");
+      const nextRun = lastRun.add(this.period);
       const now = moment();
       if (nextRun.isAfter(now)) {
         console.debug(

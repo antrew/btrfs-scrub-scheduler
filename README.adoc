@@ -61,3 +61,36 @@ chmod +x /usr/local/bin/btrfs-scrub-scheduler
 ----
 0 0 * * * /usr/local/bin/btrfs-scrub-scheduler
 ----
+
+== Configuration Parameters
+
+=== period
+
+How often to scrub filesystems.
+If the last scrub of a filesystem finished less than `period` days ago, the filesystem will not be scrubbed.
+E.g., `"period": 90` would scrub each filesystem every 3 months.
+
+Accepted values: number of days or ISO 8601.
+
+Examples for a monthly scrub:
+----
+"period": 30
+"period": "30"
+"period": "P30D"
+----
+
+=== maxDuration (optional)
+
+Maximum duration of a single scrub run.
+If the scrub takes longer than `maxDuration`, it will be interrupted and resumed on the next script execution.
+E.g., `"maxDuration": "6:30"` will cancel the scrub after 6,5 hours.
+If no `maxDuration` is configured, a scrub run will not be interrupted.
+
+Accepted values: "HH:MM", "HH:MM:SS" or ISO 8601.
+
+Examples for 7,5 hours:
+----
+"maxDuration": "7:30"
+"maxDuration": "7:30:00"
+"maxDuration": "PT7H30M"
+----

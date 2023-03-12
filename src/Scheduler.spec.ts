@@ -3,6 +3,7 @@ import { Scrubber } from "./Scrubber";
 import { Configuration } from "./Configuration";
 import { LastRun } from "./LastRun";
 import moment from "moment";
+import { ConfigLoader } from "./ConfigLoader";
 import mocked = jest.mocked;
 
 jest.mock("./Scrubber");
@@ -20,10 +21,10 @@ beforeEach(() => {
 });
 
 it("should scrub when no previous runs", async () => {
-  const configuration: Configuration = {
+  const configuration: Configuration = getConfiguration({
     period: 30,
     filesystems: ["/mnt/test"],
-  };
+  });
   const lastRun: LastRun = {};
   const scheduler = new Scheduler({ ...configuration, lastRun, scrubber });
   await scheduler.run();
@@ -34,10 +35,10 @@ it("should scrub when no previous runs", async () => {
 });
 
 it("should scrub when previous run is too old", async () => {
-  const configuration: Configuration = {
+  const configuration: Configuration = getConfiguration({
     period: 30,
     filesystems: ["/mnt/test"],
-  };
+  });
   const lastRun: LastRun = { "/mnt/test": "2023-01-01" };
   const scheduler = new Scheduler({ ...configuration, lastRun, scrubber });
   await scheduler.run();
@@ -48,10 +49,10 @@ it("should scrub when previous run is too old", async () => {
 });
 
 it("should not scrub when previous run is not too old", async () => {
-  const configuration: Configuration = {
+  const configuration: Configuration = getConfiguration({
     period: 30,
     filesystems: ["/mnt/test"],
-  };
+  });
   const LAST_RUN = "2023-01-15";
   const lastRun: LastRun = { "/mnt/test": LAST_RUN };
   const scrubber = new Scrubber();
@@ -64,10 +65,10 @@ it("should not scrub when previous run is not too old", async () => {
 });
 
 it("should scrub only one filesystem", async () => {
-  const configuration: Configuration = {
+  const configuration: Configuration = getConfiguration({
     period: 30,
     filesystems: ["/mnt/a", "/mnt/b", "/mnt/c"],
-  };
+  });
   const lastRun: LastRun = {};
   const scheduler = new Scheduler({ ...configuration, lastRun, scrubber });
   await scheduler.run();
@@ -78,11 +79,11 @@ it("should scrub only one filesystem", async () => {
 });
 
 it("should cancel a running scrub at the end of the maintenance window", async () => {
-  const configuration: Configuration = {
+  const configuration: Configuration = getConfiguration({
     period: 30,
     maxDuration: "PT1H",
     filesystems: ["/mnt/test"],
-  };
+  });
   const lastRun: LastRun = {};
   let rejectScrub;
   let scrubCalledResolve;
@@ -111,10 +112,10 @@ it("should cancel a running scrub at the end of the maintenance window", async (
 });
 
 it("should resume a cancelled scrub instead of starting a new one", async () => {
-  const configuration: Configuration = {
+  const configuration: Configuration = getConfiguration({
     period: 30,
     filesystems: ["/mnt/test"],
-  };
+  });
   const lastRun: LastRun = {};
   mocked(scrubber.status).mockResolvedValue({ aborted: true });
   const scheduler = new Scheduler({ ...configuration, lastRun, scrubber });
@@ -122,3 +123,7 @@ it("should resume a cancelled scrub instead of starting a new one", async () => 
   expect(scrubber.resume).toHaveBeenCalledTimes(1);
   expect(lastRun).toEqual({ "/mnt/test": NOW });
 });
+
+function getConfiguration(config: any) {
+  return new ConfigLoader().load(config);
+}

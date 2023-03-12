@@ -2,6 +2,7 @@ import { Scheduler } from "./Scheduler";
 import { promises as fs } from "fs";
 import { Scrubber } from "./Scrubber";
 import { Configuration } from "./Configuration";
+import { ConfigLoader } from "./ConfigLoader";
 
 const PROGRAM_NAME = "btrfs-scrub-scheduler";
 const CONFIG_FILENAME = `/etc/${PROGRAM_NAME}/config.json`;
@@ -25,9 +26,9 @@ export class Cli {
       configuration = JSON.parse(await fs.readFile(CONFIG_FILENAME, "utf-8"));
     } catch (error) {
       console.error(`Error reading configuration file: ${error}`);
-      const exampleConfiguration: Configuration = {
+      const exampleConfiguration = {
         period: 30,
-        maxDuration: "PT7H",
+        maxDuration: "7:00",
         filesystems: ["/mnt/filesystem-1", "/mnt/filesystem-2"],
       };
       console.info(`Configuration file should look like this:`);
@@ -36,7 +37,7 @@ export class Cli {
         cause: error,
       });
     }
-    return configuration;
+    return new ConfigLoader().load(configuration);
   }
 
   private async loadLastRun() {
